@@ -35,14 +35,14 @@ public class Board : MonoBehaviour
             for (int j = 0; j < totalColumns; j++)
             {
                 Tile tile = Instantiate(tilePrefab, transform);
-                tile.gameObject.name = "Tile[ " + i + " ][ " + j + " ]";
                 board[i, j] = tile;
 
                 Vector3 position = new Vector3(GetOffsetPosition(offsetHorizontal, startHorizontal, j),
                                                0f,
                                                GetOffsetPosition(offsetVertical, startVertical, i));
 
-                tile.gameObject.transform.localPosition = position;
+                tile.Initialize(i, j, transform, position);
+                tile.onTargetClickedEvent += OnTileClicked;
             }
         }
     }
@@ -55,6 +55,7 @@ public class Board : MonoBehaviour
             {
                 if (board[i, j] == null) continue;
 
+                board[i, j].onTargetClickedEvent -= OnTileClicked;
                 Destroy(board[i, j].gameObject);
             }
         }
@@ -82,5 +83,10 @@ public class Board : MonoBehaviour
         }
 
         return baseSpaw;
+    }
+
+    private void OnTileClicked(Tile target)
+    {
+        Debug.Log("Received callback from tile ");
     }
 }
