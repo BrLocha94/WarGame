@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tile : ClickableObjectBase<Tile>
 {
     [SerializeField]
-    private GameObject targetObject;
+    private Plane plane;
 
     public int row { get; private set; } = -1;
     public int column { get; private set; } = -1;
@@ -23,20 +23,18 @@ public class Tile : ClickableObjectBase<Tile>
 
     public override void OnEnter()
     {
-        targetObject.SetActive(true);
-
-        base.OnEnter();
+        plane.LitPlane();
     }
 
     public override void OnExit()
     {
-        targetObject.SetActive(false);
-
-        base.OnExit();
+        plane.UnlitPlane();
     }
 
     public override void OnClick()
     {
+        plane.Select();
+
         base.OnClick();
     }
 }

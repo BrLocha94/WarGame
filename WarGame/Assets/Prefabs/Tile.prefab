@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5cf18f676f855c41b6a3fbcfd57b735, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 5214562579465114388}
+  plane: {fileID: 4190604632504410069}
 --- !u!1 &5214562579465114388
 GameObject:
   m_ObjectHideFlags: 0
@@ -55,6 +55,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5567501920445748890}
+  - component: {fileID: 4190604632504410069}
   - component: {fileID: 633397646748446067}
   - component: {fileID: 1763890744974889306}
   - component: {fileID: 2809407388238450043}
@@ -79,6 +80,57 @@ Transform:
   m_Father: {fileID: 4686449195695354286}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4190604632504410069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5214562579465114388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ac06e2f5aadc1b4b81d048bb87fbb2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 1763890744974889306}
+  pulseMaterial: {fileID: 2100000, guid: c1fff47171de1a347af5ae5dbe7bf1e6, type: 2}
+  selectedMaterial: {fileID: 2100000, guid: e7a1d1a22caa1904da2e814d825ed181, type: 2}
+  unselectedMaterial: {fileID: 2100000, guid: f86d07c86318cb74d8b859729b97d0e2, type: 2}
+  litMaterial: {fileID: 2100000, guid: c4a10a56911c59b45b444e3c7bb0b90d, type: 2}
+  pulseCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.9962342
+      outSlope: 1.9962342
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.50094324
+      value: 1
+      inSlope: -0.003772974
+      outSlope: -0.003772974
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -2.0037801
+      outSlope: -2.0037801
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  pulseTime: 1
 --- !u!33 &633397646748446067
 MeshFilter:
   m_ObjectHideFlags: 0
