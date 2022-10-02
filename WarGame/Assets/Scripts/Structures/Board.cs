@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Board : MonoBehaviour
+public class Board : MonoBehaviour, IReceiver<GameState>
 {
+    public Action onBoardCreatedEvent;
+
     [Header("External references")]
     [SerializeField]
     private Tile tilePrefab = null;
 
-    [Header("Custom board configurations")]
+    [Header("Custom board default configurations")]
     [SerializeField]
     private int totalRows = 3;
     [SerializeField]
@@ -18,15 +21,15 @@ public class Board : MonoBehaviour
 
     private Tile[,] board;
 
-    private void Start()
+    private void CreateBoard()
     {
         Vector2 baseSpawn = transform.localPosition;
         baseSpawn = SetBaseSpaw(baseSpawn, pieceOffset);
 
-        CreateBoard(pieceOffset.x, pieceOffset.y, baseSpawn.x, baseSpawn.y);
+        StartCoroutine(CreateBoardRoutine(pieceOffset.x, pieceOffset.y, baseSpawn.x, baseSpawn.y));
     }
 
-    private void CreateBoard(float offsetHorizontal, float offsetVertical, float startHorizontal, float startVertical)
+    private IEnumerator CreateBoardRoutine(float offsetHorizontal, float offsetVertical, float startHorizontal, float startVertical)
     {
         board = new Tile[totalRows, totalColumns];
 
@@ -44,11 +47,17 @@ public class Board : MonoBehaviour
                 tile.Initialize(i, j, transform, position);
                 tile.onTargetClickedEvent += OnTileClicked;
             }
+
+            yield return null;
         }
+
+        onBoardCreatedEvent?.Invoke();
     }
 
     private void ClearBoard()
     {
+        if (board == null) return;
+
         for (int i = 0; i < totalRows; i++)
         {
             for (int j = 0; j < totalColumns; j++)
@@ -59,6 +68,8 @@ public class Board : MonoBehaviour
                 Destroy(board[i, j].gameObject);
             }
         }
+
+        board = null;
     }
 
     private float GetOffsetPosition(float offset, float start, int factor)
@@ -88,5 +99,11 @@ public class Board : MonoBehaviour
     private void OnTileClicked(Tile target)
     {
         Debug.Log("Received callback from tile ");
+    }
+
+    public void ReceiveUpdate(GameState updatedValue)
+    {
+        if (updatedValue == GameState.Initializing)
+            CreateBoard();
     }
 }
