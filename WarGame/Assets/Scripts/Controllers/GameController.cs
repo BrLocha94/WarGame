@@ -38,3 +38,10 @@ public class GameController : MonoBehaviour, IReceiver<GameState>
             this.Invoke(1f, () => StateMachineController.ExecuteTransition(GameState.Initializing));
     }
 }
+
+public enum Player
+{
+    Null,
+    Player01,
+    Player02
+}

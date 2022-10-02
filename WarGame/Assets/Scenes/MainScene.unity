@@ -224,7 +224,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 604422675}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7, z: 0}
+  m_LocalPosition: {x: 0.018141143, y: 7, z: -9.524501}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -645,9 +645,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 4686449195695354287, guid: 7da31e63244036545bfa88a116403162, type: 3}
-  totalRows: 20
-  totalColumns: 20
+  soldierPrefab: {fileID: 6442724315048194296, guid: fdf0fa9744f1a804fb1c2f30b595d717, type: 3}
+  obstaclePrefab: {fileID: 2709829213745985849, guid: 814208e6321917b4c8553c458b1a8abd, type: 3}
+  soldiersPerPlayer: 6
+  totalRows: 15
+  totalColumns: 15
   pieceOffset: {x: 1.1, y: 1.1}
+  player01Material: {fileID: 2100000, guid: 8dccf3f3c2b013548ae4993e4e87d6d3, type: 2}
+  player02Material: {fileID: 2100000, guid: ed02c2055f3ae844183852774e6ac705, type: 2}
 --- !u!114 &1361989450
 MonoBehaviour:
   m_ObjectHideFlags: 0
