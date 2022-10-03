@@ -3,8 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Board : MonoBehaviour, IReceiver<GameState>
+public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 {
+    public delegate void OnSoldierSelectedHandler(Soldier soldier);
+    public delegate void OnTargetSelectedHandler(Tile tile);
+
+    public event OnSoldierSelectedHandler onSoldierSelectedEvent;
+    public event OnTargetSelectedHandler onTargetSelectedEvent;
     public Action onBoardCreatedEvent;
 
     [Header("External references")]
@@ -34,6 +39,11 @@ public class Board : MonoBehaviour, IReceiver<GameState>
     private Tile[,] board;
     private List<Soldier> player01SoldierList;
     private List<Soldier> player02SoldierList;
+
+    private Tile selectedTile = null;
+    private Tile targetTile = null;
+
+    private Player currentPlayer;
 
     private void CreateBoard()
     {
@@ -121,6 +131,12 @@ public class Board : MonoBehaviour, IReceiver<GameState>
         player01SoldierList.Clear();
         player02SoldierList.Clear();
 
+        selectedTile = null;
+        onSoldierSelectedEvent?.Invoke(null);
+
+        targetTile = null;
+        onTargetSelectedEvent?.Invoke(null);
+
         board = null;
     }
 
@@ -151,11 +167,61 @@ public class Board : MonoBehaviour, IReceiver<GameState>
     private void OnTileClicked(Tile target)
     {
         Debug.Log("Received callback from tile ");
+
+        if(selectedTile == null)
+        {
+            selectedTile = target;
+            selectedTile.LitTile();
+            onSoldierSelectedEvent?.Invoke((Soldier)target.currentPiece);
+
+            StateMachineController.ExecuteTransition(GameState.SelectedSoldier);
+
+            return;
+        }
+
+        // Execute Action
+        if(targetTile == target)
+        {
+            //Move
+
+            //Attack
+
+            Debug.Log("Executing Action");
+
+            return;
+        }
+
+        // Change target
+        if (targetTile != null)
+            targetTile.UnlitTile();
+
+        targetTile = target;
+        onTargetSelectedEvent?.Invoke(targetTile);
     }
 
     public void ReceiveUpdate(GameState updatedValue)
     {
         if (updatedValue == GameState.Initializing)
+        {
             CreateBoard();
+            return;
+        }
+
+        if(updatedValue == GameState.Ready || 
+           updatedValue == GameState.NextPlayer ||
+           updatedValue == GameState.GameOver)
+        {
+            selectedTile = null;
+            onSoldierSelectedEvent?.Invoke(null);
+
+            targetTile = null;
+            onTargetSelectedEvent?.Invoke(null);
+            return;
+        }
+    }
+
+    public void ReceiveUpdate(Player updatedValue)
+    {
+        currentPlayer = updatedValue;
     }
 }

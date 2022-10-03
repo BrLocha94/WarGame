@@ -2,12 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class Soldier : Piece
+public sealed class Soldier : Piece, IReceiver<Player>
 {
     [SerializeField]
     private MeshRenderer meshRenderer;
 
-    public Player currentPlayer { get; private set; }
+    public string GetName() => "Soldier name";
+    public string GetPointsLeft() => "30";
+
+    public Player currentPlayer { get; private set; } = Player.Null;
+
+    private Player turnPlayer = Player.Null;
+
+    public override bool CanIteract()
+    {
+        return turnPlayer == currentPlayer;
+    }
 
     public void Initialize(Player player, Material material)
     {
@@ -15,4 +25,8 @@ public sealed class Soldier : Piece
         meshRenderer.material = material;
     }
 
+    public void ReceiveUpdate(Player updatedValue)
+    {
+        turnPlayer = updatedValue;
+    }
 }

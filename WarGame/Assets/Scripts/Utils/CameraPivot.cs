@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraPivot : MonoBehaviour
+public class CameraPivot : MonoBehaviour, IReceiver<GameState>
 {
     [Header("Camera movement keymap")]
     [SerializeField]
@@ -31,6 +31,8 @@ public class CameraPivot : MonoBehaviour
     private Vector3 moveVector = Vector3.zero;
     private Vector3 rotationVector = Vector3.zero;
 
+    bool canMove = true;
+
     private void FixedUpdate()
     {
         moveVector = Vector3.zero;
@@ -55,7 +57,17 @@ public class CameraPivot : MonoBehaviour
 
     private void Update()
     {
+        if (!canMove) return;
+
         transform.Translate(moveVector * Time.deltaTime);
         transform.Rotate(rotationVector * Time.deltaTime);
+    }
+
+    public void ReceiveUpdate(GameState updatedValue)
+    {
+        canMove = (updatedValue == GameState.Ready ||
+                   updatedValue == GameState.SelectedSoldier ||
+                   updatedValue == GameState.Moving ||
+                   updatedValue == GameState.Attacking);
     }
 }

@@ -52,8 +52,24 @@ public class Plane : MonoBehaviour
         ChangeState(PlaneState.Deactivate);
     }
 
+    public void Lit()
+    {
+        ChangeState(PlaneState.Lit);
+    }
+
     private void ChangeState(PlaneState nextState)
     {
+        if(nextState == PlaneState.Deactivate)
+        {
+            if (coroutine != null)
+                StopCoroutine(coroutine);
+
+            currentState = PlaneState.Unlit;
+            gameObject.SetActive(false);
+
+            return;
+        }
+
         if(currentState == PlaneState.Unlit)
         {
             if(nextState == PlaneState.Pulse)
@@ -74,6 +90,19 @@ public class Plane : MonoBehaviour
 
         if(currentState == PlaneState.Pulse)
         {
+            if(nextState == PlaneState.Lit)
+            {
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+
+                meshRenderer.material = litMaterial;
+                currentState = nextState;
+
+                coroutine = StartCoroutine(PulseRoutine(pulseCurve, pulseTime, true));
+
+                return;
+            }
+
             if(nextState == PlaneState.Unlit)
             {
                 if (coroutine != null)
@@ -130,5 +159,6 @@ public enum PlaneState
     Pulse,
     Selected,
     Unselected,
-    Deactivate
+    Deactivate,
+    Lit
 }

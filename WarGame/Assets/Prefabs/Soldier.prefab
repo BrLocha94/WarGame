@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6050976907526828324}
   - component: {fileID: 6442724315048194296}
+  - component: {fileID: 8618500017790473058}
   - component: {fileID: 3477399502862663697}
   - component: {fileID: 7961155058625541791}
   m_Layer: 0
@@ -47,6 +48,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pieceType: 1
   meshRenderer: {fileID: 7961155058625541791}
+--- !u!114 &8618500017790473058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7351073473516698696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1f0204ffeadd347957ed3f7a998b22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onReceive:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6442724315048194296}
+        m_TargetAssemblyTypeName: Soldier, Assembly-CSharp
+        m_MethodName: ReceiveUpdate
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!33 &3477399502862663697
 MeshFilter:
   m_ObjectHideFlags: 0
