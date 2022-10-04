@@ -30,5 +30,7 @@ public delegate void IteratorEventHandler(IteratorResult result);
 public class IteratorResult
 {
     public List<Tile> tiles = new List<Tile>();
-    public int movimentCost = 0;
+    public int excecutionCost = 0;
+    public bool canExecute = false;
+    public float acuracy = 100f;
 }

@@ -86,6 +86,36 @@ public class Plane : MonoBehaviour
 
                 return;
             }
+
+            if (nextState == PlaneState.Selected)
+            {
+                gameObject.SetActive(true);
+
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+
+                meshRenderer.material = selectedMaterial;
+                currentState = nextState;
+
+                coroutine = StartCoroutine(PulseRoutine(pulseCurve, pulseTime, true));
+
+                return;
+            }
+
+            if (nextState == PlaneState.Unselected)
+            {
+                gameObject.SetActive(true);
+
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+
+                meshRenderer.material = unselectedMaterial;
+                currentState = nextState;
+
+                coroutine = StartCoroutine(PulseRoutine(pulseCurve, pulseTime, true));
+
+                return;
+            }
         }
 
         if(currentState == PlaneState.Pulse)
@@ -115,12 +145,25 @@ public class Plane : MonoBehaviour
                 return;
             }
 
-            if(nextState == PlaneState.Selected)
+            if (nextState == PlaneState.Selected)
             {
                 if (coroutine != null)
                     StopCoroutine(coroutine);
 
                 meshRenderer.material = selectedMaterial;
+                currentState = nextState;
+
+                coroutine = StartCoroutine(PulseRoutine(pulseCurve, pulseTime, true));
+
+                return;
+            }
+
+            if (nextState == PlaneState.Unselected)
+            {
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+
+                meshRenderer.material = unselectedMaterial;
                 currentState = nextState;
 
                 coroutine = StartCoroutine(PulseRoutine(pulseCurve, pulseTime, true));

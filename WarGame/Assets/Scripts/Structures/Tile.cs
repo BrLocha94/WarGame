@@ -31,8 +31,17 @@ public class Tile : ClickableObjectBase<Tile>, IReceiver<GameState>
         if(currentPiece == null)
         {
             currentPiece = piece;
-            currentPiece.SetParent(transform);
+            currentPiece.SetParent(transform, animate, callback);
         }
+    }
+
+    public Piece PopPiece()
+    {
+        if (currentPiece == null) return null;
+
+        Piece piece = currentPiece;
+        currentPiece = null;
+        return piece;
     }
 
     public int GetMovimentPoints()
@@ -51,6 +60,16 @@ public class Tile : ClickableObjectBase<Tile>, IReceiver<GameState>
     public void UnlitTile()
     {
         plane.Deactivate();
+    }
+
+    public void SelectTile()
+    {
+        plane.Select();
+    }
+
+    public void UnselectTile()
+    {
+        plane.Unselect();
     }
 
     public void Clear()

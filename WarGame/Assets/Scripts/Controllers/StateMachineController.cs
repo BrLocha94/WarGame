@@ -60,17 +60,21 @@ public static class StateMachineController
                 break;
             case GameState.SelectedSoldier:
                 if (nextState == GameState.Ready) return true;
+                if (nextState == GameState.Processing) return true;
                 if (nextState == GameState.Moving) return true;
                 if (nextState == GameState.Attacking) return true;
                 if (nextState == GameState.NextPlayer) return true;
+                break;
+            case GameState.Processing:
+                if (nextState == GameState.SelectedSoldier) return true;
                 break;
             case GameState.Moving:
                 if (nextState == GameState.Ready) return true;
                 break;
             case GameState.Attacking:
-                if (nextState == GameState.CheckEndTurn) return true;
+                if (nextState == GameState.CheckGameOver) return true;
                 break;
-            case GameState.CheckEndTurn:
+            case GameState.CheckGameOver:
                 if (nextState == GameState.Ready) return true;
                 if (nextState == GameState.GameOver) return true;
                 break;
@@ -95,7 +99,8 @@ public enum GameState
     SelectedSoldier,
     Moving,
     Attacking,
-    CheckEndTurn,
+    CheckGameOver,
     NextPlayer,
-    GameOver
+    GameOver,
+    Processing
 }

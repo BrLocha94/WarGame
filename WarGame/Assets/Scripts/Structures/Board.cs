@@ -6,7 +6,7 @@ using UnityEngine;
 public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 {
     public delegate void OnSoldierSelectedHandler(Soldier soldier);
-    public delegate void OnTargetSelectedHandler(Tile tile);
+    public delegate void OnTargetSelectedHandler(string info);
 
     public event OnSoldierSelectedHandler onSoldierSelectedEvent;
     public event OnTargetSelectedHandler onTargetSelectedEvent;
@@ -29,6 +29,10 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
     private int defaultTotalColumns = 3;
     [SerializeField]
     private Vector2 pieceOffset = Vector2.one;
+    [SerializeField]
+    private BoardIteratorBase defaultMovimentIterator;
+    [SerializeField]
+    private BoardIteratorBase defaultAttackIterator;
 
     [Header("Material options for players")]
     [SerializeField]
@@ -47,6 +51,7 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
     private Tile selectedTile = null;
     private Tile targetTile = null;
 
+    private IteratorResult iteratorResult = null;
     private bool canCheckMouseInput = false;
 
     private Player currentPlayer;
@@ -172,6 +177,8 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
         targetTile = null;
         onTargetSelectedEvent?.Invoke(null);
 
+        iteratorResult = null;
+
         board = null;
     }
 
@@ -232,21 +239,175 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
         // Execute Action
         if(targetTile == target)
         {
-            //Move
+            if (iteratorResult != null && iteratorResult.canExecute) {
 
-            //Attack
+                //Move
+                if (targetTile.currentPiece == null)
+                {
+                    if (iteratorResult != null && iteratorResult.canExecute)
 
-            Debug.Log("Executing Action");
+                    StateMachineController.ExecuteTransition(GameState.Moving);
+                    StartCoroutine(MovimentRoutine(iteratorResult));
+
+                    return;
+                }
+                //Attack
+                else
+                {
+                    StateMachineController.ExecuteTransition(GameState.Attacking);
+                    StartCoroutine(AttackRoutine(iteratorResult));
+
+                    return;
+                }
+            }
 
             return;
         }
 
         // Change target
         if (targetTile != null)
-            targetTile.UnlitTile();
+        {
+            if (iteratorResult != null)
+            {
+                if (iteratorResult.canExecute)
+                {
+                    foreach (Tile tile in iteratorResult.tiles)
+                    {
+                        tile.UnlitTile();
+                    }
+                }
+                else
+                    targetTile.UnlitTile();
+            }
+            else
+                targetTile.UnlitTile();
+        }
 
         targetTile = target;
-        onTargetSelectedEvent?.Invoke(targetTile);
+        onTargetSelectedEvent?.Invoke(null);
+
+        iteratorResult = null;
+
+        if (targetTile != null)
+        {
+            // Moviment
+            if (targetTile.currentPiece == null)
+            {
+                StateMachineController.ExecuteTransition(GameState.Processing);
+                StartCoroutine(defaultMovimentIterator.Iteract(board, selectedTile, targetTile, OnMovimentIteratorCallback));
+            }
+            // Attack
+            else
+            {
+                StateMachineController.ExecuteTransition(GameState.Processing);
+                StartCoroutine(defaultMovimentIterator.Iteract(board, selectedTile, targetTile, OnAttackIteratorCallback));
+            }
+        }
+        else
+            iteratorResult = null;
+    }
+
+    private void OnMovimentIteratorCallback(IteratorResult result)
+    {
+        iteratorResult = result;
+
+        if (iteratorResult.canExecute)
+        {
+            foreach (Tile tile in iteratorResult.tiles)
+            {
+                tile.SelectTile();
+            }
+
+            onTargetSelectedEvent?.Invoke("Can move to tile [" + targetTile.row + "][" + targetTile.column + "] using " +
+                result.excecutionCost + " points");
+        }
+        else
+        {
+            targetTile.UnselectTile();
+            onTargetSelectedEvent?.Invoke("Cant move to this tile");
+        }
+
+        StateMachineController.ExecuteTransition(GameState.SelectedSoldier);
+    }
+
+    private void OnAttackIteratorCallback(IteratorResult result)
+    {
+        iteratorResult = result;
+
+        if (iteratorResult.canExecute)
+        {
+            // Attack action
+            targetTile.SelectTile();
+
+            onTargetSelectedEvent?.Invoke("Can atack soldier on tile [" + targetTile.row + "][" + targetTile.column + "] using " +
+                result.excecutionCost + " points with " + result.acuracy + " acuracy");
+        }
+        else
+        {
+            // Moviment action
+            targetTile.UnselectTile();
+            onTargetSelectedEvent?.Invoke("Cant attack this soldier");
+        }
+
+        StateMachineController.ExecuteTransition(GameState.SelectedSoldier);
+    }
+
+    private IEnumerator MovimentRoutine(IteratorResult result)
+    {
+        bool wait = true;
+
+        Piece piece = null;
+        Tile lastTile = selectedTile;
+        Tile tile;
+
+        Debug.Log(iteratorResult.tiles);
+
+        for(int i = 0; i < iteratorResult.tiles.Count; i++)
+        {
+            Debug.Log(iteratorResult.tiles[i].name);
+            tile = iteratorResult.tiles[i];
+            wait = true;
+            piece = lastTile.PopPiece();
+            tile.SetPiece(piece, true, () => wait = false);
+
+            yield return new WaitWhile(() => wait);
+
+            lastTile = tile;
+        }
+
+        if(piece != null)
+            piece.ExecuteMoviment(result.excecutionCost);
+
+        StateMachineController.ExecuteTransition(GameState.Ready);
+    }
+
+    private IEnumerator AttackRoutine(IteratorResult result)
+    {
+        Soldier selectedSoldier = (Soldier)selectedTile.currentPiece;
+        Soldier targetSoldier = (Soldier) targetTile.currentPiece;
+
+        int random = UnityEngine.Random.Range(0, 100);
+        if(iteratorResult.acuracy >= random)
+        {
+            targetSoldier.TakeDamage(selectedSoldier.GetAttackPower());
+
+            //Killed enemy soldier
+            if(targetSoldier.GetLifePoints() <= 0)
+            {
+                Piece piece = targetTile.PopPiece();
+
+                if (currentPlayer == Player.Player01)
+                    player02SoldierList.Remove(targetSoldier);
+                else
+                    player01SoldierList.Remove(targetSoldier);
+
+                piece.Clear();
+            }
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        StateMachineController.ExecuteTransition(GameState.CheckGameOver);
     }
 
     public void ReceiveUpdate(GameState updatedValue)
@@ -256,6 +417,16 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
         if (updatedValue == GameState.Initializing)
         {
             CreateBoard();
+            return;
+        }
+
+        if(updatedValue == GameState.CheckGameOver)
+        {
+            if (player01SoldierList.Count == 0 || player02SoldierList.Count == 0)
+                this.InvokeAfterFrame(() => StateMachineController.ExecuteTransition(GameState.GameOver));
+            else
+                this.InvokeAfterFrame(() => StateMachineController.ExecuteTransition(GameState.Ready));
+
             return;
         }
 
@@ -274,6 +445,8 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
             targetTile = null;
             onTargetSelectedEvent?.Invoke(null);
+            iteratorResult = null;
+
             return;
         }
 

@@ -12,7 +12,7 @@ public class UIController : MonoBehaviour, IReceiver<GameState>, IReceiver<Playe
     [SerializeField]
     private DetailsScreenBase<Soldier> soldierDetails;
     [SerializeField]
-    private DetailsScreenBase<Tile> targetDetails;
+    private DetailsScreenBase<string> targetDetails;
     [SerializeField]
     private Text currentPlayer;
     [SerializeField]
@@ -38,10 +38,10 @@ public class UIController : MonoBehaviour, IReceiver<GameState>, IReceiver<Playe
             soldierDetails.Deactivate();
     }
 
-    private void OnTargetSelected(Tile tile)
+    private void OnTargetSelected(string info)
     {
-        if (tile != null)
-            targetDetails.Activate(tile);
+        if (info != null)
+            targetDetails.Activate(info);
         else
             targetDetails.Deactivate();
     }

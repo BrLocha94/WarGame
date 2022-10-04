@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TargetDetails : DetailsScreenBase<Tile>
+public class TargetDetails : DetailsScreenBase<string>
 {
     [SerializeField]
     private Text nameText;
 
-    public override void Activate(Tile target)
+    public override void Activate(string info)
     {
-        base.Activate(target);
+        base.Activate(info);
+
+        nameText.text = info;
     }
 }

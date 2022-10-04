@@ -3037,8 +3037,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -167.76746, y: -131.59581}
-  m_SizeDelta: {x: 335.5349, y: 263.1915}
+  m_AnchoredPosition: {x: -167.76746, y: -98.27103}
+  m_SizeDelta: {x: 335.5349, y: 196.5419}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1308153977
 MonoBehaviour:
@@ -3143,6 +3143,8 @@ MonoBehaviour:
   defaultTotalRows: 10
   defaultTotalColumns: 10
   pieceOffset: {x: 1.1, y: 1.1}
+  defaultMovimentIterator: {fileID: 11400000, guid: f4e29472130fa0f4db4145ce491b353c, type: 2}
+  defaultAttackIterator: {fileID: 11400000, guid: 192c2cb1f5f1f2949ade67af03c91209, type: 2}
   player01Material: {fileID: 2100000, guid: 8dccf3f3c2b013548ae4993e4e87d6d3, type: 2}
   player02Material: {fileID: 2100000, guid: ed02c2055f3ae844183852774e6ac705, type: 2}
 --- !u!114 &1361989450
@@ -4003,8 +4005,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.9841, y: 1.0219002}
-  m_SizeDelta: {x: 298.5607, y: 234.815}
+  m_AnchoredPosition: {x: -1.9841, y: -1.0609}
+  m_SizeDelta: {x: 298.5607, y: 168.1654}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1733077174
 MonoBehaviour:
