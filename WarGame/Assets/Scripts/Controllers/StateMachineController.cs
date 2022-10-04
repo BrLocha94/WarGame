@@ -59,6 +59,7 @@ public static class StateMachineController
                 if (nextState == GameState.NextPlayer) return true;
                 break;
             case GameState.SelectedSoldier:
+                if (nextState == GameState.Ready) return true;
                 if (nextState == GameState.Moving) return true;
                 if (nextState == GameState.Attacking) return true;
                 if (nextState == GameState.NextPlayer) return true;

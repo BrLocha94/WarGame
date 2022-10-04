@@ -15,6 +15,8 @@ public class UIController : MonoBehaviour, IReceiver<GameState>, IReceiver<Playe
     private DetailsScreenBase<Tile> targetDetails;
     [SerializeField]
     private Text currentPlayer;
+    [SerializeField]
+    private Text hintText;
 
     private void OnEnable()
     {
@@ -46,13 +48,21 @@ public class UIController : MonoBehaviour, IReceiver<GameState>, IReceiver<Playe
 
     public void ReceiveUpdate(GameState updatedValue)
     {
-        if(updatedValue == GameState.Ready)
+        hintText.text = "";
+        buttonNextTurn.Deactivate();
+
+        if (updatedValue == GameState.Ready)
         {
             buttonNextTurn.Activate();
+            hintText.text = "Select a soldier or pass the turn";
             return;
         }
 
-        buttonNextTurn.Deactivate();
+        if(updatedValue == GameState.SelectedSoldier)
+        {
+            hintText.text = "Select a target then double click to confirm action or Right mouse click to unselect soldier";
+            return;
+        }
     }
 
     public void ReceiveUpdate(Player updatedValue)

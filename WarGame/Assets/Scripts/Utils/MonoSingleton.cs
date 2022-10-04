@@ -10,7 +10,9 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         get
         {
             if (_instance == null)
-                Debug.Log("Instance not initialized");
+            {
+                //Debug.Log("Instance not initialized");
+            }
 
             return _instance;
         }

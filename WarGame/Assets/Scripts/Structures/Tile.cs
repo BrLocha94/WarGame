@@ -35,6 +35,14 @@ public class Tile : ClickableObjectBase<Tile>, IReceiver<GameState>
         }
     }
 
+    public int GetMovimentPoints()
+    {
+        if (currentPiece != null && currentPiece.CanIteract())
+            return currentPiece.GetMovimentPoints();
+
+        return 0;
+    }
+
     public void LitTile()
     {
         plane.Lit();
@@ -82,11 +90,17 @@ public class Tile : ClickableObjectBase<Tile>, IReceiver<GameState>
             return;
         }
 
-        // Can select only current player soldiers
-        if(updatedValue == GameState.Ready && currentPiece != null && currentPiece.CanIteract())
+        // Reset Tile on new State
+        if(updatedValue == GameState.Ready)
         {
-            canCheck = true;
-            return;
+            plane.Deactivate();
+
+            // Can select only current player soldiers
+            if (currentPiece != null && currentPiece.CanIteract())
+            {
+                canCheck = true;
+                return;
+            }
         }
 
         // Try to move or attack

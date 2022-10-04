@@ -10,6 +10,7 @@ public abstract class Piece : MonoBehaviour
 
     public PieceType PieceType => pieceType;
 
+    public virtual int GetMovimentPoints() => 0;
     public virtual bool CanIteract() => pieceType == PieceType.Soldier;
 
     public void SetParent(Transform parent, bool animate = false, Action callback = null)

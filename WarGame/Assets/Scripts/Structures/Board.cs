@@ -22,11 +22,11 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
     [Header("Custom board default configurations")]
     [SerializeField]
-    private int soldiersPerPlayer = 6;
+    private int defaultSoldiersPerPlayer = 6;
     [SerializeField]
-    private int totalRows = 3;
+    private int defaultTotalRows = 3;
     [SerializeField]
-    private int totalColumns = 3;
+    private int defaultTotalColumns = 3;
     [SerializeField]
     private Vector2 pieceOffset = Vector2.one;
 
@@ -36,6 +36,10 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
     [SerializeField]
     private Material player02Material;
 
+    private int currentSoldiersPerPlayer = 0;
+    private int currentTotalRows = 0;
+    private int currentTotalColumns = 0;
+
     private Tile[,] board;
     private List<Soldier> player01SoldierList;
     private List<Soldier> player02SoldierList;
@@ -43,10 +47,21 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
     private Tile selectedTile = null;
     private Tile targetTile = null;
 
+    private bool canCheckMouseInput = false;
+
     private Player currentPlayer;
 
     private void CreateBoard()
     {
+        if (currentSoldiersPerPlayer <= 0)
+            currentSoldiersPerPlayer = defaultSoldiersPerPlayer;
+
+        if (currentTotalRows <= 0)
+            currentTotalRows = defaultTotalRows;
+
+        if (currentTotalColumns <= 0)
+            currentTotalColumns = defaultTotalColumns;
+
         Vector2 baseSpawn = transform.localPosition;
         baseSpawn = SetBaseSpaw(baseSpawn, pieceOffset);
 
@@ -55,12 +70,12 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
     private IEnumerator CreateBoardRoutine(float offsetHorizontal, float offsetVertical, float startHorizontal, float startVertical)
     {
-        board = new Tile[totalRows, totalColumns];
+        board = new Tile[currentTotalRows, currentTotalColumns];
 
         // Set all tiles on board
-        for (int i = 0; i < totalRows; i++)
+        for (int i = 0; i < currentTotalRows; i++)
         {
-            for (int j = 0; j < totalColumns; j++)
+            for (int j = 0; j < currentTotalColumns; j++)
             {
                 Tile tile = Instantiate(tilePrefab, transform);
                 board[i, j] = tile;
@@ -76,12 +91,12 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
             yield return null;
         }
 
-        //TODO: Set all soldiers on Board
+        // Instantiate all soldiers on Board
 
         player01SoldierList = new List<Soldier>();
         player02SoldierList = new List<Soldier>();
 
-        for (int i = 0; i < soldiersPerPlayer; i++)
+        for (int i = 0; i < currentSoldiersPerPlayer; i++)
         {
             Soldier soldier01 = Instantiate(soldierPrefab);
             soldier01.Initialize(Player.Player01, player01Material);
@@ -95,18 +110,38 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
         yield return null;
 
-        int initialPoint = (totalColumns / 2) - (soldiersPerPlayer / 2);
-        int finalPoint = initialPoint + soldiersPerPlayer;
+        // Set Soldiers on position
+
+        int initialPoint = (currentTotalColumns / 2) - (currentSoldiersPerPlayer / 2);
+        int finalPoint = initialPoint + currentSoldiersPerPlayer;
 
         for (int i = initialPoint; i < finalPoint; i++)
         {
             board[i, 0].SetPiece(player01SoldierList[i - initialPoint]);
-            board[i, totalColumns - 1].SetPiece(player02SoldierList[i - initialPoint]);
+            board[i, currentTotalColumns - 1].SetPiece(player02SoldierList[i - initialPoint]);
         }
 
         yield return null;
 
-        //TODO: Set all obstacles on Board
+        // Set all obstacles on Board
+
+        int random = 0;
+        for(int i = 0; i < currentTotalRows; i++)
+        {
+            for(int j = 0; j < currentTotalColumns; j++)
+            {
+                if (board[i, j].currentPiece != null) continue;
+
+                random = UnityEngine.Random.Range(0, 100);
+
+                if (random > 5) continue;
+
+                Obstacle obstacle = Instantiate(obstaclePrefab);
+                board[i, j].SetPiece(obstacle);
+            }
+
+            yield return null;
+        }
 
         yield return null;
 
@@ -117,9 +152,9 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
     {
         if (board == null) return;
 
-        for (int i = 0; i < totalRows; i++)
+        for (int i = 0; i < currentTotalRows; i++)
         {
-            for (int j = 0; j < totalColumns; j++)
+            for (int j = 0; j < currentTotalColumns; j++)
             {
                 if (board[i, j] == null) continue;
 
@@ -147,21 +182,36 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
     private Vector2 SetBaseSpaw(Vector2 baseSpaw, Vector2 offset)
     {
-        if (totalColumns > 1)
+        if (currentTotalColumns > 1)
         {
             float baseX = baseSpaw.x;
-            baseX = baseX + (-1 * (offset.x * totalColumns) / 2) + (offset.x / 2);
+            baseX = baseX + (-1 * (offset.x * currentTotalColumns) / 2) + (offset.x / 2);
             baseSpaw.x = baseX;
         }
 
-        if (totalRows > 1)
+        if (currentTotalRows > 1)
         {
             float baseY = baseSpaw.y;
-            baseY = baseY + (-1 * (offset.y * totalRows) / 2) + (offset.y / 2);
+            baseY = baseY + (-1 * (offset.y * currentTotalRows) / 2) + (offset.y / 2);
             baseSpaw.y = baseY;
         }
 
         return baseSpaw;
+    }
+
+    public void SetCustomBoardConfig(int rows, int columns, int soldiersPerPlayer)
+    {
+        currentTotalRows = rows;
+        currentTotalColumns = columns;
+        currentSoldiersPerPlayer = soldiersPerPlayer;
+    }
+
+    private void Update()
+    {
+        if (!canCheckMouseInput) return;
+
+        if (Input.GetMouseButtonDown(1))
+            StateMachineController.ExecuteTransition(GameState.Ready);
     }
 
     private void OnTileClicked(Tile target)
@@ -201,6 +251,8 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
 
     public void ReceiveUpdate(GameState updatedValue)
     {
+        canCheckMouseInput = false;
+
         if (updatedValue == GameState.Initializing)
         {
             CreateBoard();
@@ -211,11 +263,23 @@ public class Board : MonoBehaviour, IReceiver<GameState>, IReceiver<Player>
            updatedValue == GameState.NextPlayer ||
            updatedValue == GameState.GameOver)
         {
+            if (selectedTile != null)
+                selectedTile.UnlitTile();
+
             selectedTile = null;
             onSoldierSelectedEvent?.Invoke(null);
 
+            if (targetTile != null)
+                targetTile.UnlitTile();
+
             targetTile = null;
             onTargetSelectedEvent?.Invoke(null);
+            return;
+        }
+
+        if(updatedValue == GameState.SelectedSoldier)
+        {
+            canCheckMouseInput = true;
             return;
         }
     }

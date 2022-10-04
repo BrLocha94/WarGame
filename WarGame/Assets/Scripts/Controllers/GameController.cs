@@ -44,12 +44,6 @@ public class GameController : MonoSingleton<GameController>, IReceiver<GameState
 
     public void ReceiveUpdate(GameState updatedValue)
     {
-        if (updatedValue == GameState.Settings)
-        {
-            this.Invoke(1f, () => StateMachineController.ExecuteTransition(GameState.Initializing));
-            return;
-        }
-
         if (updatedValue == GameState.NextPlayer)
         {
             if (currentPlayer == Player.Player01)
